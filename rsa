@@ -1,0 +1,115 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace RSA
+{
+
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            _primes = GetAllPrimes(1000000);
+            _eprime = GetAllE(10000);
+            _Form1 = this;
+        }
+        public static Form1 _Form1;
+        private List<int> _primes;
+        private List<ulong> _eprime;
+        private Random _random = new Random();
+        public void update(string message)
+        {
+            textBoxP.Text = message;
+        }
+        public bool IsPrime(int n)
+        {
+            for (int i = 3; i * i <= n; i += 2)
+            {
+                if (n % i == 0)
+                    return false;
+            }
+            return true;
+        }
+        public bool IsPrimeE(ulong n)
+        {
+            for (ulong i = 3; i * i <= n; i += 2)
+            {
+                if (n % i == 0)
+                    return false;
+            }
+            return true;
+        }
+        public List<int> GetAllPrimes(int n)
+        {
+            var result = new List<int> { 2 };
+            for (int i = 3; i <= n; i += 2)
+                if (i >= 100000 && IsPrime(i))
+                    result.Add(i);
+            return result;
+        }
+        public List<ulong> GetAllE(ulong n)
+        {
+            ulong t, p, q;
+            p = 566311;
+            q = 566567;
+            t = (p - 1) * (q - 1);
+            var result = new List<ulong> { 2 };
+            for (ulong i = 2; i < n; i++)
+                if (i >= 1000 && GCD(i,t)==1 && IsPrimeE(i))
+                    result.Add(i);
+            return result;
+        }
+        private static ulong GCD(ulong a, ulong b)
+        {
+            while (a != 0 && b != 0)
+            {
+                if (a > b)
+                    a %= b;
+                else
+                    b %= a;
+            }
+
+            return a == 0 ? b : a;
+        }
+
+        private void ButtomRandomp_Click(object sender, EventArgs e)
+        {
+            textBoxP.Text = _primes[_random.Next(_primes.Count)].ToString();
+        }
+
+        private void ButtomRandomq_Click(object sender, EventArgs e)
+        {
+            textBoxQ.Text = _primes[_random.Next(_primes.Count)].ToString();
+        }
+
+        private void ButtomRandome_Click(object sender, EventArgs e)
+        {
+            textBoxE.Text = _eprime[_random.Next(_eprime.Count)].ToString();
+        }
+        private void ButtonD_Click(object sender, EventArgs e)
+        {
+            ulong pNumber, qNumber, eNumber, t, x, d;
+            pNumber = Convert.ToUInt64(textBoxP.Text);
+            qNumber = Convert.ToUInt64(textBoxQ.Text);
+            eNumber = Convert.ToUInt64(textBoxE.Text);
+            t = (pNumber - 1) * (qNumber - 1);
+             for (ulong i = 1; i < 10; i++)
+             {
+                x = 1 + i * t;
+                if (x % eNumber == 0)
+                {
+                    d = x / eNumber;
+                    textBoxD.Text = d.ToString();
+                }
+             }
+        }
+    }
+}
